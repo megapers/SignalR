@@ -22,6 +22,11 @@ namespace SignalRSample.Controllers
             return View();
         }
 
+        public IActionResult BasicChat()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> DeathlyHallows(string type)
         {
             if (SD.DeathlyHallowRace.ContainsKey(type))
@@ -38,6 +43,16 @@ namespace SignalRSample.Controllers
         }
 
         public IActionResult Notification()
+        {
+            return View();
+        }
+
+        public IActionResult DeathlyHallowRace()
+        {
+            return View();
+        }
+
+        public IActionResult HarryPotterHouse()
         {
             return View();
         }

@@ -4,16 +4,29 @@ namespace SignalRSample.Hubs
 {
     public class NotificationHub : Hub
     {
-        public static List<string> Messages { get; set; } = new List<string>();
+        public static int notificationCounter = 0;
+        public static List<string> messages { get; set; } = new();
 
-        public int AddMessage(string message)
+        public async Task SendMessage(string message)
         {
-            Messages.Add(message);
-
-            return Messages.Count;
+            if (!string.IsNullOrEmpty(message))
+            {
+                notificationCounter++;
+                messages.Add(message);
+                await LoadMessages();
+            }
         }
 
-        public List<string> GetMessages() { return Messages;}
+        public async Task LoadMessages()
+        {
+            await Clients.All.SendAsync("LoadNotification", messages, notificationCounter);
+        }
+
+        public override async Task OnConnectedAsync()
+        {
+            await LoadMessages();
+            await base.OnConnectedAsync();
+        }
 
     }
 }

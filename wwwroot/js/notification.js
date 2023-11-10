@@ -12,44 +12,36 @@ var connectionNotification = new signalR.HubConnectionBuilder()
     //.configureLogging(signalR.LogLevel.Information)
     .withUrl("/hubs/notificationHub").build();
 
+sendButton.disabled = true;
+
 //connect to methods that hub invokes aka receive notifications from hub
+connectionNotification.on("LoadNotification", (messages, counter) => {
+    messageList.innerHTML = "";
+    notificationCounter.innerHTML = "<span>(" + counter + ")</span>";
 
-sendButton.addEventListener("click", function (event) {
-    const message = notificationInput.value;
-    notificationInput.value = '';
-    connectionNotification.invoke("AddMessage", message).then(value => {
-        notificationCounter.innerHTML = value;
-    });
-
-    event.preventDefault();
-});
-
-navbarDropdown.addEventListener("click", function (event) {
-
-    if (navbarDropdown.getAttribute("aria-expanded") === "true") {
-        // The "aria-expanded" attribute is equal to "true"
-        console.log("aria-expanded is true");
-    } else {
-        // The "aria-expanded" attribute is not equal to "true"
-        console.log("aria-expanded is false");
+    for (let i = messages.length - 1; i >= 0; i--) {
+        var li = document.createElement("li");
+        li.textContent = "Notification - " + messages[i];
+        messageList.appendChild(li);
     }
+});
 
+sendButton.addEventListener("click", (event) => {
+    const message = notificationInput.value;
+   
+    if (message !== null && message.trim() !== "") {
+        connectionNotification.send("SendMessage", message).then(() => {
+            notificationInput.value = '';
+        });
+    };
 
     event.preventDefault();
 });
-
-
-
-//invoke hub methods aka send notification to hub
-
 
 //start connection
 function fulfilled() {
     console.log("Connection to User Hub Successful");
+    sendButton.disabled = false;
 }
 
-function rejected() {
-
-}
-
-connectionNotification.start().then(fulfilled, rejected);
+connectionNotification.start().then(fulfilled);
